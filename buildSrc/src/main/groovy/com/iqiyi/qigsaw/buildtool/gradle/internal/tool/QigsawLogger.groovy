@@ -22,30 +22,24 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle
+package com.iqiyi.qigsaw.buildtool.gradle.internal.tool
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
-abstract class QigsawPlugin implements Plugin<Project> {
+class QigsawLogger {
 
-    public static final String QIGSAW = "qigsaw"
+    static final String LOG_PREFIX = "Qigsaw Build Message: "
 
-    public static final String ASSEMBLE = "Assemble"
+    private static final Logger BUILD_LOGGER = Logging.getLogger(Project.class)
 
-    public static final String INSTALL = "Install"
-
-    public static final String QIGSAW_ASSEMBLE_TASK_PREFIX = QIGSAW + ASSEMBLE
-
-    public static final String QIGSAW_INSTALL_TASK_PREFIX = QIGSAW + INSTALL
-
-    static boolean hasQigsawTask(Project project) {
-        List<String> startTaskNames = project.gradle.startParameter.taskNames
-        for (String taskName : startTaskNames) {
-            if (taskName.contains(QIGSAW_ASSEMBLE_TASK_PREFIX) || taskName.contains(QIGSAW_INSTALL_TASK_PREFIX)) {
-                return true
-            }
-        }
-        return false
+    static void e(String msg) {
+        BUILD_LOGGER.error("${LOG_PREFIX}${msg}")
     }
+
+    static void w(String msg) {
+        BUILD_LOGGER.warn("${LOG_PREFIX}${msg}")
+    }
+
 }

@@ -22,22 +22,33 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle.internal.model
+package com.iqiyi.qigsaw.buildtool.gradle.task
 
-import com.iqiyi.qigsaw.buildtool.gradle.internal.entity.SplitInfo
+import com.android.SdkConstants
+import com.iqiyi.qigsaw.buildtool.gradle.internal.tool.FileUtils
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 
-interface SplitApkProcessor {
+class CopySplitManifestTask extends DefaultTask {
 
-    File signSplitAPKIfNeed(File splitApk)
+    @InputFile
+    File splitManifestFile
 
-    SplitInfo createSplitInfo(String splitName,
-                              String versionName,
-                              Integer versionCode,
-                              int minApiLevel,
-                              List<String> dfDependencies,
-                              File splitManifest,
-                              File splitSignedApk,
-                              boolean releaseSplitApk,
-                              List<String> restrictWorkProcessesForSplits)
+    @OutputDirectory
+    File splitManifestOutputDir
+
+    @TaskAction
+    void copySplitApk() {
+        File outputManifest = new File(splitManifestOutputDir, project.name + SdkConstants.DOT_XML)
+        if (outputManifest.exists()) {
+            outputManifest.delete()
+        }
+        if (!splitManifestOutputDir.exists()) {
+            splitManifestOutputDir.mkdirs()
+        }
+        FileUtils.copyFile(splitManifestFile, outputManifest)
+    }
 
 }

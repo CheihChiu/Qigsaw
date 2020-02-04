@@ -22,12 +22,31 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle.internal.model
+package com.iqiyi.qigsaw.buildtool.gradle.internal.tool
 
-import com.iqiyi.qigsaw.buildtool.gradle.internal.entity.SplitInfo
+import com.google.gson.Gson
 
-interface SplitInfoCreator {
+class TypeClassFileParser {
 
-    SplitInfo create()
+    static Object parseFile(File file, Class typeClass) {
+        String str = readInputStreamContent(new FileInputStream(file))
+        return parseTypeClass(str, typeClass)
+    }
 
+    private static String readInputStreamContent(InputStream is) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(is))
+        StringBuilder stringBuffer = new StringBuilder()
+        String str
+        while ((str = br.readLine()) != null) {
+            stringBuffer.append(str)
+        }
+        FileUtils.closeQuietly(is)
+        FileUtils.closeQuietly(br)
+        return stringBuffer.toString()
+    }
+
+    private static Object parseTypeClass(String splitDetailsStr, Class typeClass) {
+        Gson gson = new Gson()
+        return gson.fromJson(splitDetailsStr, typeClass)
+    }
 }

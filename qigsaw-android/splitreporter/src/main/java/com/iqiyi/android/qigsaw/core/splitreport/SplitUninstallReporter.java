@@ -22,36 +22,24 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle.task
+package com.iqiyi.android.qigsaw.core.splitreport;
 
-import java.util.concurrent.ConcurrentHashMap
+import android.support.annotation.WorkerThread;
 
-final class SplitDependencyStatistics {
+import java.util.List;
 
-    private final ConcurrentHashMap<String, List<String>> dependenciesMap = new ConcurrentHashMap<>()
+/**
+ * report uninstall status of split APKs, called in main process.
+ */
+public interface SplitUninstallReporter {
 
-    private static SplitDependencyStatistics sInstance
+    /**
+     * When splits are uninstalled successfully, this method will be invoked.
+     *
+     * @param uninstalledSplits splits which have been uninstalled successfully.
+     * @param cost              time in ms.
+     */
+    @WorkerThread
+    void onSplitUninstallOK(List<String> uninstalledSplits, long cost);
 
-    static SplitDependencyStatistics getInstance() {
-        synchronized (SplitDependencyStatistics.class) {
-            if (sInstance == null) {
-                sInstance = new SplitDependencyStatistics()
-            }
-            return sInstance
-        }
-    }
-
-    void putDependencies(String projectName, String variantName, List<String> dependencies) {
-        String key = "${projectName}_${variantName}"
-        dependenciesMap.put(key, dependencies)
-    }
-
-    List<String> getDependencies(String projectName, String variantName) {
-        String key = "${projectName}_${variantName}"
-        return dependenciesMap.get(key)
-    }
-
-    void clear() {
-        dependenciesMap.clear()
-    }
 }

@@ -71,9 +71,9 @@ class AGPCompat {
     static File getMergeJniLibsDirCompat(Task mergeJniLibsTask, def versionAGP) {
         File mergeJniLibsDir
         if (versionAGP < VersionNumber.parse("3.5.0")) {
-            mergeJniLibsDir = new File(mergeJniLibsTask.outputStream.getRootLocation(), "0${File.separator}lib")
+            mergeJniLibsDir = mergeJniLibsTask.outputStream.getRootLocation()
         } else {
-            mergeJniLibsDir = new File(mergeJniLibsTask.outputDir.asFile.get(), "lib")
+            mergeJniLibsDir = mergeJniLibsTask.outputDir.asFile.get()
         }
         if (mergeJniLibsDir == null) {
             throw new GradleException("Can't read 'outputDir' form " + mergeJniLibsTask == null ? null : mergeJniLibsTask.class.name)
@@ -163,6 +163,14 @@ class AGPCompat {
         return task
     }
 
+    static getStripDebugSymbolTask(Project project, String variantName) {
+        Task task = project.tasks.findByName("transformNativeLibsWithStripDebugSymbolFor${variantName}")
+        if (task == null) {
+            task = project.tasks.findByName("strip${variantName}DebugSymbols")
+        }
+        return task
+    }
+
     static Task getAssemble(ApplicationVariant variant) {
         try {
             return variant.assembleProvider.get()
@@ -177,13 +185,19 @@ class AGPCompat {
     }
 
     static Task getR8Task(Project project, String variantName) {
-        String r8TaskName = "transformClassesAndResourcesWithR8For${variantName}"
-        return project.tasks.findByName(r8TaskName)
+        String r8TransformTaskName = "transformClassesAndResourcesWithR8For${variantName}"
+        Task r8TransformTask = project.tasks.findByName(r8TransformTaskName)
+        return r8TransformTask
     }
 
     static Task getMultiDexTask(Project project, String variantName) {
-        String multiDexTaskName = "transformClassesWithMultidexlistFor${variantName}"
-        return project.tasks.findByName(multiDexTaskName)
+        String multiDexTaskName = "multiDexList${variantName}"
+        String multiDexTaskTransformName = "transformClassesWithMultidexlistFor${variantName}"
+        def multiDexTask = project.tasks.findByName(multiDexTaskName)
+        if (multiDexTask == null) {
+            multiDexTask = project.tasks.findByName(multiDexTaskTransformName)
+        }
+        return multiDexTask
     }
 
     static Task getProguardTask(Project project, String variantName) {
@@ -204,6 +218,5 @@ class AGPCompat {
     static Task getDexSplitterTask(Project project, String variantName) {
         String proguardTaskName = "transformDexWithDexSplitterFor${variantName}"
         return project.tasks.findByName(proguardTaskName)
-
     }
 }

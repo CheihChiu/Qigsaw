@@ -1,18 +1,25 @@
 package com.iqiyi.qigsaw.sample;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 
+import com.iqiyi.android.qigsaw.core.SplitActivityLifecycleCallbacks;
 import com.iqiyi.android.qigsaw.core.SplitConfiguration;
 import com.iqiyi.android.qigsaw.core.Qigsaw;
 import com.iqiyi.android.qigsaw.core.splitload.SplitLoad;
+import com.iqiyi.android.qigsaw.core.splitreport.SplitBriefInfo;
 import com.iqiyi.qigsaw.sample.downloader.SampleDownloader;
 import com.iqiyi.qigsaw.sample.reporter.SampleLogger;
 import com.iqiyi.qigsaw.sample.reporter.SampleSplitInstallReporter;
 import com.iqiyi.qigsaw.sample.reporter.SampleSplitLoadReporter;
+import com.iqiyi.qigsaw.sample.reporter.SampleSplitUninstallReporter;
 import com.iqiyi.qigsaw.sample.reporter.SampleSplitUpdateReporter;
 
 public class QigsawApplication extends Application {
@@ -37,6 +44,7 @@ public class QigsawApplication extends Application {
                 .verifySignature(true)
                 .loadReporter(new SampleSplitLoadReporter(this))
                 .installReporter(new SampleSplitInstallReporter(this))
+                .uninstallReporter(new SampleSplitUninstallReporter(this))
                 .updateReporter(new SampleSplitUpdateReporter(this))
                 .obtainUserConfirmationDialogClass(SampleObtainUserConfirmationDialog.class)
                 .build();
@@ -47,6 +55,43 @@ public class QigsawApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Qigsaw.onApplicationCreated();
+        Qigsaw.registerSplitActivityLifecycleCallbacks(new SplitActivityLifecycleCallbacks() {
+
+            @Override
+            public void onSplitActivityCreated(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onSplitActivityStarted(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onSplitActivityResumed(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onSplitActivityPaused(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onSplitActivityStopped(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onSplitActivitySaveInstanceState(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity, @NonNull Bundle outState) {
+
+            }
+
+            @Override
+            public void onSplitActivityDestroyed(@NonNull SplitBriefInfo briefInfo, @NonNull Activity activity) {
+
+            }
+        });
     }
 
     @Override

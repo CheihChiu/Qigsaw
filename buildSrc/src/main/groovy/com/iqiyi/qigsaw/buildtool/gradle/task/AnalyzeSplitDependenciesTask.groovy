@@ -31,9 +31,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-class AnalyzeDependenciesTask extends DefaultTask {
-
-    String variantName
+class AnalyzeSplitDependenciesTask extends DefaultTask {
 
     @Input
     List<String> dfClassPaths
@@ -44,8 +42,7 @@ class AnalyzeDependenciesTask extends DefaultTask {
     @OutputDirectory
     File outputDir
 
-    void initArgs(String variantName, List<String> splitAllDependencies, List<String> dfClassPaths) {
-        this.variantName = variantName
+    void initArgs(List<String> splitAllDependencies, List<String> dfClassPaths) {
         this.splitAllDependencies = splitAllDependencies
         this.dfClassPaths = dfClassPaths
     }

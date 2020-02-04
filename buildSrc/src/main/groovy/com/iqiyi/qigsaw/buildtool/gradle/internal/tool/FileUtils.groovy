@@ -24,6 +24,8 @@
 
 package com.iqiyi.qigsaw.buildtool.gradle.internal.tool
 
+import com.google.gson.Gson
+
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -91,6 +93,22 @@ class FileUtils {
         }
     }
 
+    static boolean createFileForTypeClass(Object typeClass, File dest) {
+        try {
+            Gson gson = new Gson()
+            String splitDetailsStr = gson.toJson(typeClass)
+            dest.createNewFile()
+            BufferedOutputStream osm = new BufferedOutputStream(new FileOutputStream(dest))
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(osm))
+            writer.write(splitDetailsStr)
+            writer.close()
+            osm.close()
+        } catch (Throwable e) {
+            return false
+        }
+        return true
+    }
+
     static void copyFile(InputStream source, OutputStream dest)
             throws IOException {
         InputStream is = source
@@ -107,10 +125,10 @@ class FileUtils {
         }
     }
 
-
     static void copyFile(File source, File dest)
             throws IOException {
         copyFile(new FileInputStream(source), new FileOutputStream(dest))
+        QigsawLogger.w("Succeed to copy ${source.absolutePath} to ${dest.absolutePath}")
     }
 
     static void closeQuietly(Closeable obj) {

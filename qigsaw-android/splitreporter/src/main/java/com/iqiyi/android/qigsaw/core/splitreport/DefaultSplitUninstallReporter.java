@@ -22,30 +22,26 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle
+package com.iqiyi.android.qigsaw.core.splitreport;
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import android.content.Context;
 
-abstract class QigsawPlugin implements Plugin<Project> {
+import com.iqiyi.android.qigsaw.core.common.SplitLog;
 
-    public static final String QIGSAW = "qigsaw"
+import java.util.List;
 
-    public static final String ASSEMBLE = "Assemble"
+public class DefaultSplitUninstallReporter implements SplitUninstallReporter {
 
-    public static final String INSTALL = "Install"
+    private static final String TAG = "SplitUninstallReporter";
 
-    public static final String QIGSAW_ASSEMBLE_TASK_PREFIX = QIGSAW + ASSEMBLE
+    protected final Context context;
 
-    public static final String QIGSAW_INSTALL_TASK_PREFIX = QIGSAW + INSTALL
+    public DefaultSplitUninstallReporter(Context context) {
+        this.context = context;
+    }
 
-    static boolean hasQigsawTask(Project project) {
-        List<String> startTaskNames = project.gradle.startParameter.taskNames
-        for (String taskName : startTaskNames) {
-            if (taskName.contains(QIGSAW_ASSEMBLE_TASK_PREFIX) || taskName.contains(QIGSAW_INSTALL_TASK_PREFIX)) {
-                return true
-            }
-        }
-        return false
+    @Override
+    public void onSplitUninstallOK(List<String> uninstalledSplits, long cost) {
+        SplitLog.i(TAG, "Succeed to uninstall %s, cost time %d ms.", uninstalledSplits.toString(), cost);
     }
 }

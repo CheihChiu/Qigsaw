@@ -22,30 +22,15 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle
+package com.iqiyi.qigsaw.buildtool.gradle.internal.model
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import com.iqiyi.qigsaw.buildtool.gradle.internal.entity.SplitDetails
+import com.iqiyi.qigsaw.buildtool.gradle.internal.entity.SplitInfo
 
-abstract class QigsawPlugin implements Plugin<Project> {
+interface SplitDetailsProcessor {
 
-    public static final String QIGSAW = "qigsaw"
+    SplitDetails processSplitDetails(SplitDetails rawSplitDetails, Map<String, SplitInfo> splitInfoMap)
 
-    public static final String ASSEMBLE = "Assemble"
+    void uploadSplitApkIfNeed(String builtInUrlPrefix, boolean updateMode, SplitInfo splitInfo) throws Exception
 
-    public static final String INSTALL = "Install"
-
-    public static final String QIGSAW_ASSEMBLE_TASK_PREFIX = QIGSAW + ASSEMBLE
-
-    public static final String QIGSAW_INSTALL_TASK_PREFIX = QIGSAW + INSTALL
-
-    static boolean hasQigsawTask(Project project) {
-        List<String> startTaskNames = project.gradle.startParameter.taskNames
-        for (String taskName : startTaskNames) {
-            if (taskName.contains(QIGSAW_ASSEMBLE_TASK_PREFIX) || taskName.contains(QIGSAW_INSTALL_TASK_PREFIX)) {
-                return true
-            }
-        }
-        return false
-    }
 }

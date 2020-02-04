@@ -22,30 +22,21 @@
  * SOFTWARE.
  */
 
-package com.iqiyi.qigsaw.buildtool.gradle
+package com.iqiyi.qigsaw.buildtool.gradle.internal.tool
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-abstract class QigsawPlugin implements Plugin<Project> {
+class TinkerHelper {
 
-    public static final String QIGSAW = "qigsaw"
-
-    public static final String ASSEMBLE = "Assemble"
-
-    public static final String INSTALL = "Install"
-
-    public static final String QIGSAW_ASSEMBLE_TASK_PREFIX = QIGSAW + ASSEMBLE
-
-    public static final String QIGSAW_INSTALL_TASK_PREFIX = QIGSAW + INSTALL
-
-    static boolean hasQigsawTask(Project project) {
-        List<String> startTaskNames = project.gradle.startParameter.taskNames
-        for (String taskName : startTaskNames) {
-            if (taskName.contains(QIGSAW_ASSEMBLE_TASK_PREFIX) || taskName.contains(QIGSAW_INSTALL_TASK_PREFIX)) {
-                return true
+    static String getOldApk(Project project) {
+        try {
+            String oldApk = project.extensions.tinkerPatch.oldApk
+            if (oldApk != null && new File(oldApk).exists()) {
+                return oldApk
             }
+        } catch (Throwable ignored) {
+
         }
-        return false
+        return null
     }
 }
