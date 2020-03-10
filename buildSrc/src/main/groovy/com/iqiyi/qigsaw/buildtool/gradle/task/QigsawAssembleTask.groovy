@@ -110,7 +110,7 @@ class QigsawAssembleTask extends DefaultTask {
     File splitDependenciesOutputDir
 
     QigsawAssembleTask() {
-        this.releaseSplitApk = QigsawSplitExtensionHelper.getReleaseSplitApk(project)
+        this.releaseSplitApk = QigsawSplitExtensionHelper.isReleaseSplitApk(project)
         this.restrictWorkProcessesForSplits = QigsawSplitExtensionHelper.getRestrictWorkProcessesForSplits(project)
     }
 
@@ -194,7 +194,7 @@ class QigsawAssembleTask extends DefaultTask {
             QigsawLogger.w("dynamic feature ${splitName} has dependencies: ${dfDependencies.toString()}")
             //sign split apk if in need.
             SplitApkSigner apkSigner = new SplitApkSigner(project, variantName)
-            File splitSignedApk = apkSigner.signSplitAPKIfNeed(splitApkFile)
+            File splitSignedApk = apkSigner.signAPKIfNeed(splitApkFile, null)
             //create split info
             SplitInfo rawSplitInfo = SplitInfo.newBuilder()
                     .splitApkFile(splitSignedApk)
@@ -287,6 +287,18 @@ class QigsawAssembleTask extends DefaultTask {
     void copySplitJsonFileAndSplitAPKs(List<SplitInfo> splits, File splitJsonFile, Set<String> fixedAbis, boolean copyToAssets) {
         if (!this.assetsDir.exists()) {
             this.assetsDir.mkdirs()
+        }
+        //delete old split json files
+        File[] oldSplitJsonFiles = assetsDir.listFiles(new FileFilter() {
+            @Override
+            boolean accept(File file) {
+                return file.name.startsWith("qigsaw_") && file.name.endsWith(SdkConstants.DOT_JSON)
+            }
+        })
+        if (oldSplitJsonFiles != null) {
+            oldSplitJsonFiles.each {
+                it.delete()
+            }
         }
         File outputJsonFile = new File(assetsDir, splitJsonFile.name)
         if (outputJsonFile.exists()) {

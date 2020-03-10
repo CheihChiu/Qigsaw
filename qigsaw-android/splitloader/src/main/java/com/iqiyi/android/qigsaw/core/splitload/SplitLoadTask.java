@@ -87,7 +87,8 @@ abstract class SplitLoadTask implements Runnable {
                                   String splitName,
                                   List<String> addedDexPaths,
                                   File optimizedDirectory,
-                                  File librarySearchPath) throws SplitLoadException;
+                                  File librarySearchPath,
+                                  List<String> dependencies) throws SplitLoadException;
 
     abstract void onSplitActivateFailed(ClassLoader classLoader);
 
@@ -112,8 +113,10 @@ abstract class SplitLoadTask implements Runnable {
                 } catch (InterruptedException e) {
                     String splitName = splitFileIntents.get(0).getStringExtra(SplitConstants.KET_NAME);
                     SplitInfo info = infoManager.getSplitInfo(appContext, splitName);
-                    SplitBriefInfo splitBriefInfo = new SplitBriefInfo(splitName, info.getSplitVersion(), info.isBuiltIn());
-                    reportLoadResult(Collections.<SplitBriefInfo>emptyList(), Collections.singletonList(new SplitLoadError(splitBriefInfo, SplitLoadError.INTERRUPTED_ERROR, e)), 0);
+                    if (info != null) {
+                        SplitBriefInfo splitBriefInfo = new SplitBriefInfo(info.getSplitName(), info.getSplitVersion(), info.isBuiltIn());
+                        reportLoadResult(Collections.<SplitBriefInfo>emptyList(), Collections.singletonList(new SplitLoadError(splitBriefInfo, SplitLoadError.INTERRUPTED_ERROR, e)), 0);
+                    }
                 }
             }
         }
@@ -128,7 +131,11 @@ abstract class SplitLoadTask implements Runnable {
         for (Intent splitFileIntent : splitFileIntents) {
             String splitName = splitFileIntent.getStringExtra(SplitConstants.KET_NAME);
             SplitInfo info = infoManager.getSplitInfo(appContext, splitName);
-            SplitBriefInfo splitBriefInfo = new SplitBriefInfo(splitName, info.getSplitVersion(), info.isBuiltIn());
+            if (info == null) {
+                SplitLog.w(TAG, "Unable to get info of %s, just skip!", splitName == null ? "null" : splitName);
+                continue;
+            }
+            SplitBriefInfo splitBriefInfo = new SplitBriefInfo(info.getSplitName(), info.getSplitVersion(), info.isBuiltIn());
             //if if split has been loaded, just skip.
             if (checkSplitLoaded(splitName)) {
                 SplitLog.i(TAG, "Split %s has been loaded!", splitName);
@@ -152,7 +159,7 @@ abstract class SplitLoadTask implements Runnable {
             File splitDir = SplitPathManager.require().getSplitDir(info);
             ClassLoader classLoader;
             try {
-                classLoader = loadCode(loader, splitName, addedDexPaths, optimizedDirectory, librarySearchPath);
+                classLoader = loadCode(loader, splitName, addedDexPaths, optimizedDirectory, librarySearchPath, info.getDependencies());
             } catch (SplitLoadException e) {
                 SplitLog.printErrStackTrace(TAG, e, "Failed to load split %s code!", splitName);
                 loadErrors.add(new SplitLoadError(splitBriefInfo, e.getErrorCode(), e.getCause()));
